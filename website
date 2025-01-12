@@ -1,0 +1,541 @@
+<html><head><base href="/" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Corgie Universe Miner</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: linear-gradient(45deg, #1a1a2e, #16213e);
+        font-family: Arial, sans-serif;
+        color: white;
+        position: relative;
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-width: 100%;
+        padding: 0;
+      }
+    
+      body::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        z-index: -1;
+        background-image: 
+          radial-gradient(2px 2px at 40px 60px, #fff, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 20px 50px, #fff9, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 30px 100px, #fff9, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 40px 60px, #fff9, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 110px 90px, #fff9, rgba(0,0,0,0)),
+          radial-gradient(2px 2px at 190px 150px, #fff9, rgba(0,0,0,0));
+        background-repeat: repeat;
+        animation: space-animation 300s linear infinite;
+      }
+    
+      @keyframes space-animation {
+        from {
+          transform: rotate(0deg) translateY(-100px);
+        }
+        to {
+          transform: rotate(360deg) translateY(-100px);
+        }
+      }
+    
+      @keyframes shooting-star {
+        0% {
+          transform: translateX(0) translateY(0) rotate(45deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(1000px) translateY(1000px) rotate(45deg);
+          opacity: 0;
+        }
+      }
+    
+      .shooting-star {
+        position: fixed;
+        width: 2px;
+        height: 50px;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+        animation: shooting-star 5s linear infinite;
+      }
+    
+      .shooting-star:nth-child(1) { top: 10%; left: -10%; animation-delay: 0s; }
+      .shooting-star:nth-child(2) { top: 20%; left: -10%; animation-delay: 2s; }
+      .shooting-star:nth-child(3) { top: 30%; left: -10%; animation-delay: 4s; }
+    
+      .wallet-bar {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        margin-bottom: 0.5rem;
+      }
+    
+      .wallet {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 215, 0, 0.1);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        border: 2px solid #ffd700;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+    
+      .wallet:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+      }
+    
+      .cgu-logo {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    
+      .wallet-amount {
+        font-size: 1em;
+        color: #ffd700;
+        font-weight: bold;
+      }
+    
+      .game-container {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.8rem;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        width: 95%;
+        margin: 0 auto 0.5rem auto;
+        max-width: 400px;
+      }
+    
+      .game-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        margin-bottom: 0.5rem;
+      }
+    
+      .game-header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+    
+      .game-header h1 {
+        font-size: 1.1em;
+        margin: 0;
+      }
+    
+      .giphy-container {
+        width: 200px;
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 50%;
+        margin: 0 auto;
+        border: 3px solid #ffd700;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        transition: transform 0.3s;
+      }
+    
+      .giphy-container:hover {
+        transform: scale(1.02);
+      }
+    
+      .giphy-container iframe {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1.5);
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+      }
+    
+      .coins-display {
+        font-size: 1.5em;
+        margin: 10px 0;
+      }
+    
+      @keyframes glow {
+        from {
+          text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+        to {
+          text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+      }
+    
+      .controls {
+        margin: 15px 0;
+      }
+    
+      button {
+        background: linear-gradient(45deg, #4a90e2, #357abd);
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.9em;
+        width: 90%;
+        max-width: 200px;
+        box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        transform: translateY(0);
+      }
+    
+      button:hover {
+        background: linear-gradient(45deg, #357abd, #2a5c8f);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+      }
+    
+      button:disabled {
+        background: #666;
+        cursor: not-allowed;
+      }
+    
+      .score {
+        margin: 15px 0;
+        font-size: 0.9em;
+      }
+    
+      .footer {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        margin-top: 0.5rem;
+      }
+    
+      .footer-content {
+        max-width: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    
+      .footer-section {
+        flex: 1;
+        min-width: unset;
+        padding: 0 10px;
+      }
+    
+      .footer-section h3 {
+        color: #ffd700;
+        margin-bottom: 0.5rem;
+        font-size: 1em;
+      }
+    
+      .footer-section p {
+        font-size: 0.8em;
+        margin: 0.3em 0;
+      }
+    
+      .social-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+    
+      .social-links a {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        transition: color 0.3s;
+        font-size: 0.8em;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    
+      .social-links a:hover {
+        color: #ffd700;
+        background: rgba(255, 215, 0, 0.2);
+        border-color: #ffd700;
+        transform: translateY(-2px);
+      }
+    
+      .contract-info {
+        background: rgba(255, 215, 0, 0.1);
+        padding: 0.5rem;
+        border-radius: 10px;
+        margin-top: 1rem;
+        word-break: break-all;
+        font-size: 0.7em;
+      }
+    
+      .contract-label {
+        color: #ffd700;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+    
+      @media (max-width: 380px) {
+        .giphy-container {
+          width: 160px;
+          height: 160px;
+        }
+    
+        .game-header h1 {
+          font-size: 0.9em;
+        }
+    
+        .coins-display {
+          font-size: 1.2em;
+        }
+    
+        button {
+          padding: 8px 16px;
+          font-size: 0.85em;
+        }
+    
+        .footer-section p {
+          font-size: 0.75em;
+        }
+      }
+    
+      @keyframes mining {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    
+      .mining-active .giphy-container {
+        position: relative;
+      }
+    
+      .mining-active .giphy-container::after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border: 2px solid #ffd700;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: mining 2s linear infinite;
+      }
+    
+      body::after {
+        content: '';
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: 
+          radial-gradient(circle at 50% 50%, rgba(76, 0, 255, 0.1), transparent 50%),
+          radial-gradient(circle at 70% 30%, rgba(255, 0, 128, 0.1), transparent 50%),
+          radial-gradient(circle at 30% 70%, rgba(0, 255, 255, 0.1), transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+        animation: nebula 20s ease infinite alternate;
+      }
+    
+      @keyframes nebula {
+        0% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+      }
+    
+      .page-wrapper {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        z-index: 1;
+      }
+    
+      .space-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+    
+      @media screen and (max-width: 480px) {
+        .game-container {
+          width: 98%;
+          padding: 0.5rem;
+        }
+    
+        .giphy-container {
+          width: 180px;
+          height: 180px;
+        }
+    
+        .coins-display {
+          font-size: 1.3em;
+        }
+    
+        .footer-content {
+          gap: 1rem;
+        }
+    
+        .contract-info {
+          font-size: 0.7em;
+          padding: 0.5rem;
+        }
+      }
+    </style>
+    </head>
+    <body>
+    <div class="space-background">
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+    </div>
+    
+    <div class="page-wrapper">
+      <div class="wallet-bar">
+        <div class="wallet">
+          <img src="https://github.com/Kartikatokens/logo/blob/main/logo%20corgie%20astronout.jpg?raw=true" alt="CGU Logo" class="cgu-logo">
+          <span class="wallet-amount">CGU: <span id="total-coins">0.000000</span></span>
+        </div>
+      </div>
+      
+      <div class="game-container">
+        <div class="game-header">
+          <img src="https://github.com/Kartikatokens/logo/blob/main/logo%20corgie%20astronout.jpg?raw=true" alt="CGU Logo">
+          <h1>Corgie Universe Miner</h1>
+        </div>
+        
+        <div class="giphy-container">
+          <iframe src="https://giphy.com/embed/ux6vPam8BubuCxbW20" width="280" height="280" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+        </div>
+      
+        <div class="coins-display">
+          CGU: <span id="points">0.000000</span>
+        </div>
+      
+        <div class="controls">
+          <button onclick="startStop()" id="startStopBtn">Start Mining</button>
+        </div>
+      
+        <div class="score">
+          <p>Target: Mine for exactly 1 hour for 0.001 CGU!</p>
+          <p>High Score: <span id="high-score">0.000000</span> CGU</p>
+        </div>
+      </div>
+      
+      <footer class="footer">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>About Corgie Universe</h3>
+            <p>Corgie Universe (CGU) is a groundbreaking token built on the TON blockchain, revolutionizing multiple sectors:</p>
+            <p>• E-commerce Integration</p>
+            <p>• Gaming Ecosystem</p>
+            <p>• Digital Asset Management</p>
+            <p>Experience the future of blockchain technology with our innovative platform that combines gaming, commerce, and digital assets in one unified ecosystem.</p>
+            <div class="contract-info">
+              <div class="contract-label">Smart Contract Address:</div>
+              <div>EQDpKHp-OQL3woNWPLCetjEibn2cwCwA9uztRDOqSCZ-9zYv</div>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h3>Social Media</h3>
+            <div class="social-links">
+              <a href="https://x.com/CorgieU25705">
+                <span> Twitter</span>
+              </a>
+              <a href=https://discord.gg/wtpVjFBt"">
+                <span> Discord</span>
+              </a>
+              <a href="https://t.me/CorgieUniverse">
+                <span> Telegram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script>
+      let startTime = 0;
+      let isRunning = false;
+      let interval;
+      let points = 0;
+      let highScore = 0;
+      let totalCoins = 0;
+      const POINTS_PER_MILLISECOND = 0.001 / (60 * 60 * 1000); 
+      const ONE_HOUR_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+    
+      const pointsDisplay = document.getElementById('points');
+      const startStopBtn = document.getElementById('startStopBtn');
+      const totalCoinsDisplay = document.getElementById('total-coins');
+    
+      function updateStopwatch() {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - startTime;
+        
+        points = elapsedTime * POINTS_PER_MILLISECOND;
+        pointsDisplay.textContent = points.toFixed(6);
+    
+        // Auto stop when reaching 1 hour
+        if (elapsedTime >= ONE_HOUR_MS) {
+          startStop();
+        }
+      }
+    
+      function startStop() {
+        if (!isRunning) {
+          startTime = Date.now();
+          interval = setInterval(updateStopwatch, 10);
+          startStopBtn.textContent = 'Stop Mining';
+          isRunning = true;
+          document.querySelector('.game-container').classList.add('mining-active');
+        } else {
+          clearInterval(interval);
+          const finalTime = Date.now() - startTime;
+          points = finalTime * POINTS_PER_MILLISECOND;
+          pointsDisplay.textContent = points.toFixed(6);
+    
+          // Add points to total coins
+          totalCoins += points;
+          totalCoinsDisplay.textContent = totalCoins.toFixed(6);
+    
+          if (points > highScore) {
+            highScore = points;
+            document.getElementById('high-score').textContent = highScore.toFixed(6);
+          }
+    
+          startStopBtn.textContent = 'Start Mining';
+          isRunning = false;
+          document.querySelector('.game-container').classList.remove('mining-active');
+        }
+      }
+    </script>
+    </body></html>
